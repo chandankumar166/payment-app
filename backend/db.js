@@ -4,12 +4,20 @@ const bcrypt = require('bcrypt');
 mongoose.connect('mongodb+srv://chandan:mongodb@cluster0.lqpfrmw.mongodb.net/Payment')
     .then(() => console.log('Mongodb was connected successfully'));
 
-const userSchema = mongoose.Schema({
+const userSchema = new mongoose.Schema({
     username: String,
     firstName: String,
     lastName: String,
     hashedPassword: String
 });
+
+const accountSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    balance: Number
+})
 
 userSchema.methods.createHash = async function (password) {
     const saltRounds = 10;
@@ -23,5 +31,6 @@ userSchema.methods.validatePassword = async function (password, hashedPassword) 
 };
 
 const User = mongoose.model('user', userSchema);
+const Account = mongoose.model('account', accountSchema);
 
-module.exports = {User};
+module.exports = {User, Account};

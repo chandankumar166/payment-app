@@ -11,14 +11,14 @@ const userSchema = mongoose.Schema({
     hashedPassword: String
 });
 
-userSchema.methods.createHash = async (password) => {
+userSchema.methods.createHash = async function (password) {
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
     const hashedPassword = await bcrypt.hash(password, salt);
     return hashedPassword;
 };
 
-userSchema.methods.validatePassword = async (password, hashedPassword) => {
+userSchema.methods.validatePassword = async function (password, hashedPassword) {
     return await bcrypt.compare(password, hashedPassword);
 };
 

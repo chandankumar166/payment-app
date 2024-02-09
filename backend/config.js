@@ -1,2 +1,4 @@
-export const PORT = 3000;
-export const JWT_SECRET = 'jwt_secret'
+const PORT = 3000;
+const JWT_SECRET = 'jwt_secret'
+
+module.exports = {PORT, JWT_SECRET}

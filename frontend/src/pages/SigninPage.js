@@ -1,6 +1,13 @@
-import {Button, Paper, Stack, TextField, Typography} from '@mui/material';
-import React from 'react';
+import {Paper, Stack} from '@mui/material';
+import React, {useState} from 'react';
 import Password from '../components/Password';
+import Heading from '../components/Heading';
+import Subheading from '../components/Subheading';
+import InputBox from '../components/InputBox';
+import SubmitButton from '../components/SubmitButton';
+import BottomWarning from '../components/BottomWarning';
+import axios from 'axios';
+import {useNavigate} from 'react-router-dom';
 
 const SigninPage = () => {
 
@@ -16,16 +23,29 @@ const SigninPage = () => {
     padding: '1rem'
   };
 
+  const [existingUser, setExistingUser] = useState({})
+  const navigate = useNavigate();
+
+  const updateExistingUser = (key, value) => {
+    setExistingUser({...existingUser, [key]: value})
+  }
+
+  const handleSignIn = async () => {
+    const response = await axios.post('http://localhost:3000/api/v1/user/signin', existingUser);
+    localStorage.setItem('token', 'Bearer ' + response.data.token);
+    navigate('/dashboard')
+  }
+
   return (
     <div style={signinFormStyles}>
       <Paper elevation={4} sx={paperStyles}>
         <Stack spacing={2}>
-          <Typography variant='h4' sx={{textAlign: 'center'}}><strong>Sign In</strong></Typography>
-          <Typography sx={{textAlign: 'center'}}>Enter your credentials to access your account</Typography>
-          <TextField color='black' label="Email" />
-          <Password />
-          <Button fullWidth variant='contained' sx={{background: 'black', color: 'white', '&:hover': {background: 'black'}}}>Sign In</Button>
-          <Typography sx={{textAlign: 'center'}}>Don't have an account? Sign Up</Typography>
+          <Heading heading={'Sign In'}/>
+          <Subheading text={'Enter your credentials to access your account'} />
+          <InputBox label={'Email'} onChange={(e) => updateExistingUser('username', e.target.value)}/>
+          <Password onChange={(e) => updateExistingUser('password', e.target.value)}/>
+          <SubmitButton buttonText={'Sign In'} onClick={handleSignIn} />
+          <BottomWarning warning={`Don't have an account?`} text={'Sign Up'} link={'/signup'} />
         </Stack>
       </Paper>
     </div>

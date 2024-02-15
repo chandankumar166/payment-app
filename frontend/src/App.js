@@ -4,6 +4,7 @@ import SignupPage from './pages/SignupPage';
 import {ThemeProvider, createTheme} from '@mui/material';
 import SigninPage from './pages/SigninPage';
 import DashboardPage from './pages/DashboardPage';
+import MoneyTransfer from './pages/MoneyTransfer';
 
 function App() {
 
@@ -22,7 +23,7 @@ function App() {
             <Route path='/signup' element={<SignupPage />} />
             <Route path='/signin' element={<SigninPage />} />
             <Route path='/dashboard' element={<DashboardPage />} />
-            <Route path='/send' />
+            <Route path='/send' element={<MoneyTransfer />}/>
           </Routes>
         </BrowserRouter>
       </div>

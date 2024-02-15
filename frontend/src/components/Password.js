@@ -3,7 +3,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import React, {useState} from 'react';
 
-const Password = () => {
+const Password = ({onChange}) => {
 
     const [showPassword, setShowPassword] = useState(false);
 
@@ -18,6 +18,7 @@ const Password = () => {
                 <OutlinedInput
                     label="password"
                     color='black'
+                    onChange={onChange}
                     type={showPassword ? 'text' : 'password'}
                     endAdornment={
                         <InputAdornment position='end'>

@@ -18,30 +18,35 @@ const Users = () => {
     gap: '0.5rem'
   };
   const buttonStyles = {
-    background: 'black', 
+    background: 'black',
     color: 'white', '&:hover': {
       background: 'black'
     }
-  }
+  };
 
   const [filter, setFilter] = useState('');
   const [filteredUsers, setFilteredUsers] = useState([]);
   const navigate = useNavigate();
 
   const updateFilter = (newFilter) => {
-    setFilter(newFilter)
-  }
+    setFilter(newFilter);
+  };
   const filterUsers = async () => {
-    const response = await axios.get(`http://localhost:3000/api/v1/user/bulk?filter=${filter}`)
+    const response = await axios.get(`http://localhost:3000/api/v1/user/bulk?filter=${filter}`,
+      {
+        headers: {
+          Authorization: localStorage.getItem('token')
+        }
+      });
     setFilteredUsers(response.data.users);
-  }
+  };
   const handleMoneyTransfer = (user) => {
-    navigate(`/send?id=${user.userId}&name=${user.firstName}`)
-  }
+    navigate(`/send?id=${user.userId}&name=${user.firstName}`);
+  };
   useEffect(() => {
-      filterUsers();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[filter])
+    filterUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filter]);
   return (
     <>
       <Typography variant='h4'>Users</Typography>
@@ -58,11 +63,11 @@ const Users = () => {
             return (
               <div style={userStyles} key={user.username}>
                 <div style={userDetailsStyles}>
-                  <Avatar>{user.firstName[0]}</Avatar>
-                  <Typography>{user.firstName + ' ' + user.lastName}</Typography>
+                  <Avatar>{user?.firstName[0]}</Avatar>
+                  <Typography>{user?.firstName + ' ' + user?.lastName}</Typography>
                 </div>
-                <Button variant='contained' sx={buttonStyles} onClick={() =>handleMoneyTransfer(user)}>Send Money</Button>
-                
+                <Button variant='contained' sx={buttonStyles} onClick={() => handleMoneyTransfer(user)}>Send Money</Button>
+
               </div>
             );
           })

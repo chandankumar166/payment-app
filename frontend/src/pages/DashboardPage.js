@@ -3,6 +3,7 @@ import Appbar from '../components/Appbar';
 import Balance from '../components/Balance';
 import Users from '../components/Users';
 import axios from 'axios';
+import {useNavigate} from 'react-router-dom';
 
 const DashboardPage = () => {
   const bodyStyles = {
@@ -15,18 +16,33 @@ const DashboardPage = () => {
     gap: '1rem',
   };
 
-  const [users, setusers] = useState({});
-  const fetchData = async () => {
-    const response = await axios.get('http://localhost:3000/api/v1/user/bulk');
-    setusers(response.data.users);
+  const [loggedInUser, setLoggedInUser] = useState({});
+  const navigate = useNavigate();
+
+  const fetchUser = async () => {
+    if (!localStorage.getItem('token')) {
+      navigate('/signin')
+    }
+    try {
+      const response = await axios.get('http://localhost:3000/api/v1/user/me', {
+        headers: {
+          Authorization: localStorage.getItem('token')
+        }
+      });
+      setLoggedInUser(response.data.user);
+    }
+    catch (e) {
+      navigate('/signin');
+    }
   };
   useEffect(() => {
-    fetchData();
+    fetchUser();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <div>
-      <Appbar users={users} />
+      <Appbar user={loggedInUser} />
       <div style={bodyStyles}>
         <Balance />
         <div style={moneyTransferStyles}>

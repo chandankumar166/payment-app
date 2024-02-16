@@ -6,7 +6,6 @@ const {default: mongoose} = require('mongoose');
 const accountRouter = express.Router();
 
 accountRouter.get('/balance', authMiddleware, async (req, res) => {
-    console.log("inside blanace route");
     const userId = req.userId;
     const account = await Account.findOne({userId: userId});
     if (!account) {

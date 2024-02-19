@@ -2,6 +2,7 @@ import {Avatar, Box, Button, Paper, Stack, TextField, Typography} from '@mui/mat
 import React, {useState} from 'react';
 import axios from 'axios';
 import {useSearchParams, useNavigate} from 'react-router-dom';
+import VerifyUser from '../components/VerifyUser';
 
 const MoneyTransfer = () => {
     const modalPageStyles = {
@@ -9,6 +10,7 @@ const MoneyTransfer = () => {
         justifyContent: 'center',
         alignItems: 'center',
         height: '100vh',
+        backgroundColor: '#EEEEEE'
     };
     const modalStyles = {
         padding: '2rem',
@@ -22,41 +24,55 @@ const MoneyTransfer = () => {
     };
 
     const [amount, setAmount] = useState(0);
+    const [errorMessage, setErrorMessage] = useState('');
+    const [isError, setIsError] = useState(false);
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
 
     const updateAmount = (e) => {
+        setIsError(false);
+        setErrorMessage('');
         setAmount(e.target.value);
     };
 
     const transfer = async () => {
-        try {
-            await axios.post('http://localhost:3000/api/v1/account/transfer', {
-                amount,
-                to: searchParams.get('id')
-            },
-                {
-                    headers: {
-                        Authorization: localStorage.getItem('token')
-                    }
-                });
-            navigate('/dashboard');
+        const user = await VerifyUser();
+        if (user && amount > 0 && (amount+'').split('.')[1] ? (amount + '').split('.')[1].length <= 2 : true) {
+            try {
+                await axios.post('http://localhost:3000/api/v1/account/transfer', {
+                    amount,
+                    to: searchParams.get('id')
+                },
+                    {
+                        headers: {
+                            Authorization: localStorage.getItem('token')
+                        }
+                    });
+                navigate('/dashboard');
+            }
+            catch (error) {
+                navigate('/dashboard');
+            }
         }
-        catch(error) {
-            navigate('/dashboard')
+        else if (user == null) {
+            navigate('/signin');
+        }
+        else {
+            setIsError(true);
+            setErrorMessage('Invalid Inputs');
         }
     };
 
     return (
         <div style={modalPageStyles}>
             <Stack component={Paper} elevation={7} spacing={2} style={modalStyles}>
-                <h1 style={{textAlign: 'center'}}>Send Money</h1>
+                <Typography variant='h4' style={{textAlign: 'center'}}>Send Money</Typography>
                 <Box style={userDetailsStyles}>
-                    <Avatar sx={{background: 'green'}}>U1</Avatar>
-                    <Typography variant='h5' sx={{textAlign: 'center'}}><strong>{searchParams.get('name')}</strong></Typography>
+                    <Avatar sx={{background: '#65B741'}}>{searchParams.get('name')[0]}</Avatar>
+                    <Typography variant='h5' sx={{textAlign: 'center'}}>{searchParams.get('name')}</Typography>
                 </Box>
-                <TextField color='black' label="Enter amount" onChange={updateAmount} />
-                <Button variant='contained' color='success' onClick={transfer}>Initiate Transfer</Button>
+                <TextField error={isError} color='black' label="Enter amount (in Rs)" onChange={updateAmount} helperText={errorMessage} />
+                <Button variant='contained' color='green' sx={{color: 'white'}} onClick={transfer}>Initiate Transfer</Button>
             </Stack>
         </div>
     );

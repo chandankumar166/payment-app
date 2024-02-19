@@ -15,35 +15,49 @@ const SigninPage = () => {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'start',
-    marginTop: '7rem',
-    height: '100vh'
+    paddingTop: '7rem',
+    height: 'calc(100vh - 7rem)'
   };
   const paperStyles = {
     borderRadius: '0.5rem',
     padding: '1rem'
   };
 
-  const [existingUser, setExistingUser] = useState({})
+  const [existingUser, setExistingUser] = useState({});
+  const [isError, setIsError] = useState({email: false, password: false});
+  const [errorMessage, setErrorMessage] = useState({});
   const navigate = useNavigate();
 
   const updateExistingUser = (key, value) => {
-    setExistingUser({...existingUser, [key]: value})
-  }
+    setExistingUser({...existingUser, [key]: value});
+  };
 
   const handleSignIn = async () => {
-    const response = await axios.post('http://localhost:3000/api/v1/user/signin', existingUser);
-    localStorage.setItem('token', 'Bearer ' + response.data.token);
-    navigate('/dashboard')
-  }
+    try {
+      const response = await axios.post('http://localhost:3000/api/v1/user/signin', existingUser);
+      localStorage.setItem('token', 'Bearer ' + response.data.token);
+      navigate('/dashboard');
+    }
+    catch (error) {
+      if (error.response.status === 411) {
+        setIsError({...isError, email: true})
+        setErrorMessage({...errorMessage, email: 'User does not exist'});
+      }
+      else if (error.response.status === 401) {
+        setIsError({email: false, password: true})
+        setErrorMessage({email: '', password: 'Incorrect Password'})
+      }
+    }
+  };
 
   return (
     <div style={signinFormStyles}>
       <Paper elevation={4} sx={paperStyles}>
         <Stack spacing={2}>
-          <Heading heading={'Sign In'}/>
+          <Heading heading={'Sign In'} />
           <Subheading text={'Enter your credentials to access your account'} />
-          <InputBox label={'Email'} onChange={(e) => updateExistingUser('username', e.target.value)}/>
-          <Password onChange={(e) => updateExistingUser('password', e.target.value)}/>
+          <InputBox label={'Email'} error={isError} errorMessage={errorMessage} onChange={(e) => updateExistingUser('username', e.target.value)} />
+          <Password error={isError} errorMessage={errorMessage} onChange={(e) => updateExistingUser('password', e.target.value)} />
           <SubmitButton buttonText={'Sign In'} onClick={handleSignIn} />
           <BottomWarning warning={`Don't have an account?`} text={'Sign Up'} link={'/signup'} />
         </Stack>

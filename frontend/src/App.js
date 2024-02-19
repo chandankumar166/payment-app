@@ -13,6 +13,9 @@ function App() {
       black: {
         main: 'black',
       },
+      green: {
+        main: '#65B741'
+      }
     },
   });
   return (
@@ -24,7 +27,7 @@ function App() {
             <Route path='/signup' element={<SignupPage />} />
             <Route path='/signin' element={<SigninPage />} />
             <Route path='/dashboard' element={<DashboardPage />} />
-            <Route path='/send' element={<MoneyTransfer />}/>
+            <Route path='/send' element={<MoneyTransfer />} />
           </Routes>
         </BrowserRouter>
       </div>

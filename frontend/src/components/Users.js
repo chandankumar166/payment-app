@@ -2,6 +2,7 @@ import {Avatar, Button, Stack, TextField, Typography} from '@mui/material';
 import axios from 'axios';
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
+import VerifyUser from './VerifyUser';
 
 const Users = () => {
 
@@ -32,6 +33,11 @@ const Users = () => {
     setFilter(newFilter);
   };
   const filterUsers = async () => {
+    const user = await VerifyUser();
+    if (!user) {
+      navigate('/signin');
+      return;
+    }
     const response = await axios.get(`http://localhost:3000/api/v1/user/bulk?filter=${filter}`,
       {
         headers: {
@@ -63,7 +69,7 @@ const Users = () => {
             return (
               <div style={userStyles} key={user.username}>
                 <div style={userDetailsStyles}>
-                  <Avatar>{user?.firstName[0]}</Avatar>
+                  <Avatar>{user?.firstName[0].toUpperCase()}</Avatar>
                   <Typography>{user?.firstName + ' ' + user?.lastName}</Typography>
                 </div>
                 <Button variant='contained' sx={buttonStyles} onClick={() => handleMoneyTransfer(user)}>Send Money</Button>

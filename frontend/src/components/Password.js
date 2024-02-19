@@ -1,9 +1,9 @@
-import {FormControl, IconButton, InputAdornment, InputLabel, OutlinedInput} from '@mui/material';
+import {FormControl, FormHelperText, IconButton, InputAdornment, InputLabel, OutlinedInput} from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import React, {useState} from 'react';
 
-const Password = ({onChange}) => {
+const Password = ({onChange, error, errorMessage}) => {
 
     const [showPassword, setShowPassword] = useState(false);
 
@@ -20,6 +20,8 @@ const Password = ({onChange}) => {
                     color='black'
                     onChange={onChange}
                     type={showPassword ? 'text' : 'password'}
+                    error={error?.password}
+                    
                     endAdornment={
                         <InputAdornment position='end'>
                             <IconButton
@@ -29,6 +31,9 @@ const Password = ({onChange}) => {
                         </InputAdornment>
                     }
                 />
+                <FormHelperText error>
+                    {errorMessage?.password}
+                </FormHelperText>
             </FormControl>
         </>
     );

@@ -1,7 +1,9 @@
-import {AppBar, Avatar, Toolbar, Typography} from '@mui/material';
-import React from 'react';
+import {AppBar, Avatar, Menu, MenuItem, Toolbar, Typography} from '@mui/material';
+import React, {useEffect, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
+import VerifyUser from './VerifyUser';
 
-const Appbar = ({user}) => {
+const Appbar = () => {
     const toolbarStyles = {
         display: 'flex',
         justifyContent: 'space-between',
@@ -15,18 +17,60 @@ const Appbar = ({user}) => {
         gap: '1rem',
         color: 'black'
     };
+    const [loggedInUser, setLoggedInUser] = useState({});
+    const [anchorEl, setAnchorE1] = useState(null);
+    const navigate = useNavigate();
 
-  return (
-      <AppBar sx={{background: 'transparent'}} position='static'>
-          <Toolbar style={toolbarStyles}>
-              <Typography variant='h5'><strong>Payments App</strong></Typography>
-              <div style={avatarStyles}>
-                  <Typography component='p'>Hello {user?.firstName + user?.lastName}</Typography>
-                  <Avatar>C</Avatar>
-              </div>
-          </Toolbar>
-      </AppBar>
-  );
-}
+    const fetchUser = async () => {
+        const user = await VerifyUser();
+        if (!user) {
+            navigate('/signin');
+            return;
+        }
+        setLoggedInUser(user);
+    };
+    useEffect(() => {
+        fetchUser();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+
+    const openMenu = (e) => {
+        setAnchorE1(e.currentTarget);
+    };
+    const closeMenu = (e) => {
+        localStorage.removeItem('token');
+        navigate('/signin')
+        setAnchorE1(null);
+    }
+    const handleClose = (e) => {
+        setAnchorE1(null)
+    }
+
+    return (
+        <AppBar sx={{background: 'transparent'}} position='static'>
+            <Toolbar style={toolbarStyles}>
+                <Typography variant='h5'><strong>Payments App</strong></Typography>
+                <div style={avatarStyles}>
+                    <Typography component='p'>Hello {loggedInUser.firstName +' ' + loggedInUser.lastName}</Typography>
+                    <Avatar onClick={openMenu}>{loggedInUser.firstName ? loggedInUser.firstName[0].toUpperCase() : ''}</Avatar>
+                    <Menu
+                        anchorEl={anchorEl}
+                        anchorOrigin={{
+                            vertical: 'top',
+                            horizontal: 'right',
+                        }}
+                        open={Boolean(anchorEl)}
+                        onClose={handleClose}
+                    >
+                        <MenuItem onClick={handleClose}>Profile</MenuItem>
+                        <MenuItem onClick={handleClose}>My Account</MenuItem>
+                        <MenuItem onClick={closeMenu}>Sign out</MenuItem>
+                    </Menu>
+                </div>
+            </Toolbar>
+        </AppBar>
+    );
+};
 
 export default Appbar;

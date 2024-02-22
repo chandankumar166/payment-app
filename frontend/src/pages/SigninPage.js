@@ -23,29 +23,41 @@ const SigninPage = () => {
     padding: '1rem'
   };
 
-  const [existingUser, setExistingUser] = useState({});
-  const [isError, setIsError] = useState({email: false, password: false});
+  const [userDetails, setUserDetails] = useState({});
+  const [isError, setIsError] = useState({username: false, password: false});
   const [errorMessage, setErrorMessage] = useState({});
   const navigate = useNavigate();
 
-  const updateExistingUser = (key, value) => {
-    setExistingUser({...existingUser, [key]: value});
+  const updateUserDetails = (key, value) => {
+    setUserDetails({...userDetails, [key]: value});
+  };
+  const displayError = (field) => {
+    setIsError({[field]: true});
+    setErrorMessage({[field]: `${field} is required`});
   };
 
   const handleSignIn = async () => {
+    const fields = ['username', 'password'];
+    if (!fields.every(field => {
+      if (!userDetails.hasOwnProperty(field) || userDetails[field].trim() === '') {
+        displayError(field);
+        return false;
+      }
+      return true;
+    })) return;
     try {
-      const response = await axios.post('http://localhost:3000/api/v1/user/signin', existingUser);
+      const response = await axios.post('http://localhost:3000/api/v1/user/signin', userDetails);
       localStorage.setItem('token', 'Bearer ' + response.data.token);
       navigate('/dashboard');
     }
     catch (error) {
       if (error.response.status === 411) {
-        setIsError({...isError, email: true})
-        setErrorMessage({...errorMessage, email: 'User does not exist'});
+        setIsError({username: true});
+        setErrorMessage({username: 'Email is not valid'});
       }
       else if (error.response.status === 401) {
-        setIsError({email: false, password: true})
-        setErrorMessage({email: '', password: 'Incorrect Password'})
+        setIsError({username: false, password: true});
+        setErrorMessage({username: '', password: 'Incorrect Password'});
       }
     }
   };
@@ -54,12 +66,32 @@ const SigninPage = () => {
     <div style={signinFormStyles}>
       <Paper elevation={4} sx={paperStyles}>
         <Stack spacing={2}>
-          <Heading heading={'Sign In'} />
-          <Subheading text={'Enter your credentials to access your account'} />
-          <InputBox label={'Email'} error={isError} errorMessage={errorMessage} onChange={(e) => updateExistingUser('username', e.target.value)} />
-          <Password error={isError} errorMessage={errorMessage} onChange={(e) => updateExistingUser('password', e.target.value)} />
-          <SubmitButton buttonText={'Sign In'} onClick={handleSignIn} />
-          <BottomWarning warning={`Don't have an account?`} text={'Sign Up'} link={'/signup'} />
+          <Heading
+            heading={'Sign In'}
+          />
+          <Subheading
+            text={'Enter your credentials to access your account'}
+          />
+          <InputBox
+            label={'Email'}
+            error={isError?.username}
+            errorMessage={errorMessage?.username}
+            onChange={(e) => updateUserDetails('username', e.target.value)}
+          />
+          <Password
+            error={isError?.password}
+            errorMessage={errorMessage?.password}
+            onChange={(e) => updateUserDetails('password', e.target.value)}
+          />
+          <SubmitButton
+            buttonText={'Sign In'}
+            onClick={handleSignIn}
+          />
+          <BottomWarning
+            warning={`Don't have an account?`}
+            text={'Sign Up'}
+            link={'/signup'}
+          />
         </Stack>
       </Paper>
     </div>

@@ -7,8 +7,8 @@ const InputBox = ({label, onChange, error, errorMessage}) => {
       color='black'
       label={label}
       onChange={onChange}
-      error={error?.email}
-      helperText={errorMessage?.email} />
+      error={error}
+      helperText={errorMessage} />
   );
 };
 

@@ -53,7 +53,7 @@ const Appbar = () => {
                 <Typography variant='h5'><strong>Payments App</strong></Typography>
                 <div style={avatarStyles}>
                     <Typography component='p'>Hello {loggedInUser.firstName +' ' + loggedInUser.lastName}</Typography>
-                    <Avatar onClick={openMenu}>{loggedInUser.firstName ? loggedInUser.firstName[0].toUpperCase() : ''}</Avatar>
+                    <Avatar onClick={openMenu}>{loggedInUser.firstName ? loggedInUser.firstName[0].toUpperCase() : loggedInUser.lastName && loggedInUser.lastName[0].toUpperCase()}</Avatar>
                     <Menu
                         anchorEl={anchorEl}
                         anchorOrigin={{

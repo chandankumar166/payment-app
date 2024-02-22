@@ -4,9 +4,8 @@ import {Link} from 'react-router-dom';
 
 const BottomWarning = ({warning, text, link}) => {
     const linkStyles = {
-        '&: focus, &: hover, &: visited, &: link, &:active': {
-            textDecoration: 'none'
-        }
+        textDecoration: 'none',
+        color: '#836FFF'
     };
     return (
         <Typography sx={{textAlign: 'center'}}>{warning}

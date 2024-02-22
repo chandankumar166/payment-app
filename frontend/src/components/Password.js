@@ -20,8 +20,7 @@ const Password = ({onChange, error, errorMessage}) => {
                     color='black'
                     onChange={onChange}
                     type={showPassword ? 'text' : 'password'}
-                    error={error?.password}
-                    
+                    error={error}
                     endAdornment={
                         <InputAdornment position='end'>
                             <IconButton
@@ -32,7 +31,7 @@ const Password = ({onChange, error, errorMessage}) => {
                     }
                 />
                 <FormHelperText error>
-                    {errorMessage?.password}
+                    {errorMessage}
                 </FormHelperText>
             </FormControl>
         </>

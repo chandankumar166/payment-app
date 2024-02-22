@@ -3,6 +3,7 @@ import React, {useState} from 'react';
 import axios from 'axios';
 import {useSearchParams, useNavigate} from 'react-router-dom';
 import VerifyUser from '../components/VerifyUser';
+import Heading from '../components/Heading';
 
 const MoneyTransfer = () => {
     const modalPageStyles = {
@@ -51,7 +52,13 @@ const MoneyTransfer = () => {
                 navigate('/dashboard');
             }
             catch (error) {
-                navigate('/dashboard');
+                // console.log(error);
+                // if (error.response.data.message === 'Insufficient balance') {
+                    console.log(error);
+                    setIsError(true);
+                    setErrorMessage(error.response.data.message)
+                // }
+                // navigate('/dashboard');
             }
         }
         else if (user == null) {
@@ -66,7 +73,8 @@ const MoneyTransfer = () => {
     return (
         <div style={modalPageStyles}>
             <Stack component={Paper} elevation={7} spacing={2} style={modalStyles}>
-                <Typography variant='h4' style={{textAlign: 'center'}}>Send Money</Typography>
+                <Heading heading={'Send Money'}/>
+
                 <Box style={userDetailsStyles}>
                     <Avatar sx={{background: '#65B741'}}>{searchParams.get('name')[0]}</Avatar>
                     <Typography variant='h5' sx={{textAlign: 'center'}}>{searchParams.get('name')}</Typography>

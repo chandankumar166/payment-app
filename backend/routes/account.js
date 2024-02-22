@@ -19,29 +19,33 @@ accountRouter.post('/transfer', authMiddleware, async (req, res) => {
         const session = await mongoose.startSession();
         session.startTransaction();
 
-        const fromAccountId = req.userId;
-        const toAccountId = req.body.to;
+        const senderAccountId = req.userId;
+        const receiverAccountId = req.body.to;
         const amount = req.body.amount;
 
-        const fromAccount = await Account.findOne({userId: fromAccountId});
-        if (!fromAccount) {
+        const senderAccount = await Account.findOne({userId: senderAccountId}).session(session);
+        const receiverAccount = await Account.findOne({userId: receiverAccountId}).session(session);
+        if (!senderAccount || !receiverAccount) {
             session.abortTransaction();
             return res.status(400).json({message: 'Invalid account'});
         }
-        if (fromAccount.balance < amount) {
+        if (senderAccount.balance < amount) {
             session.abortTransaction();
             return res.status(400).json({message: "Insufficient balance"});
         }
 
-        await Account.findOneAndUpdate({userId: fromAccountId}, {
-            $inc: {
-                balance: -amount
+        const senderBalance = (senderAccount.balance - amount);
+        const receiverBalance = parseFloat(receiverAccount.balance + amount);
+
+        await Account.findOneAndUpdate({userId: senderAccountId}, {
+            $set: {
+                balance: senderBalance.toFixed(2)
             }
         }).session(session);
 
-        await Account.findOneAndUpdate({userId: toAccountId}, {
-            $inc: {
-                balance: amount
+        await Account.findOneAndUpdate({userId: receiverAccountId}, {
+            $set: {
+                balance: receiverBalance.toFixed(2)
             }
         }).session(session);
 

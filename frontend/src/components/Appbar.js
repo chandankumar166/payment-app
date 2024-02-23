@@ -2,6 +2,7 @@ import {AppBar, Avatar, Menu, MenuItem, Toolbar, Typography} from '@mui/material
 import React, {useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import VerifyUser from './VerifyUser';
+import axios from 'axios';
 
 const Appbar = () => {
     const toolbarStyles = {
@@ -46,6 +47,14 @@ const Appbar = () => {
     const handleClose = (e) => {
         setAnchorE1(null)
     }
+    const deleteUser = async () => {
+        await axios.delete('http://localhost:3000/api/v1/account/delete', {
+            headers: {
+                Authorization: localStorage.getItem('token')
+            }
+        })
+        navigate('/signin')
+    }
 
     return (
         <AppBar sx={{background: 'transparent'}} position='static'>
@@ -65,6 +74,7 @@ const Appbar = () => {
                     >
                         <MenuItem onClick={handleClose}>Profile</MenuItem>
                         <MenuItem onClick={handleClose}>My Account</MenuItem>
+                        <MenuItem onClick={deleteUser}>Delete User</MenuItem>
                         <MenuItem onClick={closeMenu}>Sign out</MenuItem>
                     </Menu>
                 </div>

@@ -34,18 +34,18 @@ accountRouter.post('/transfer', authMiddleware, async (req, res) => {
             return res.status(400).json({message: "Insufficient balance"});
         }
 
-        const senderBalance = (senderAccount.balance - amount);
-        const receiverBalance = parseFloat(receiverAccount.balance + amount);
+        const senderBalance = (senderAccount.balance - amount).toFixed(2)
+        const receiverBalance = (receiverAccount.balance + +amount).toFixed(2)
 
         await Account.findOneAndUpdate({userId: senderAccountId}, {
             $set: {
-                balance: senderBalance.toFixed(2)
+                balance: senderBalance
             }
         }).session(session);
 
         await Account.findOneAndUpdate({userId: receiverAccountId}, {
             $set: {
-                balance: receiverBalance.toFixed(2)
+                balance: receiverBalance
             }
         }).session(session);
 
@@ -110,5 +110,13 @@ accountRouter.post('/transfer', authMiddleware, async (req, res) => {
         return res.status(500).send(error);
     }
 });
+
+accountRouter.delete('/delete', authMiddleware, async (req, res) => {
+    const userId = req.userId;
+    await User.deleteOne({_id: userId})
+    await Account.deleteOne({userId: userId})
+    await Transaction.deleteOne({userId: userId})
+    return res.status(200).json({message: 'User deleted successfully'})
+})
 
 module.exports = {accountRouter};

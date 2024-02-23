@@ -38,10 +38,10 @@ const MoneyTransfer = () => {
 
     const transfer = async () => {
         const user = await VerifyUser();
-        if (user && amount > 0 && (amount+'').split('.')[1] ? (amount + '').split('.')[1].length <= 2 : true) {
+        if (user && amount > 0 && (amount + '').split('.')[1] ? (amount + '').split('.')[1].length <= 2 : true) {
             try {
-                await axios.post('http://localhost:3000/api/v1/account/transfer', {
-                    amount,
+                const response = await axios.post('http://localhost:3000/api/v1/account/transfer', {
+                    amount:amount,
                     to: searchParams.get('id')
                 },
                     {
@@ -49,12 +49,12 @@ const MoneyTransfer = () => {
                             Authorization: localStorage.getItem('token')
                         }
                     });
+                    console.log(response);
                 navigate('/dashboard');
             }
             catch (error) {
-                    console.log(error);
-                    setIsError(true);
-                    setErrorMessage(error.response.data.message)
+                setIsError(true);
+                setErrorMessage(error.response.data.message);
             }
         }
         else if (user == null) {
@@ -69,7 +69,7 @@ const MoneyTransfer = () => {
     return (
         <div style={modalPageStyles}>
             <Stack component={Paper} elevation={7} spacing={2} style={modalStyles}>
-                <Heading heading={'Send Money'}/>
+                <Heading heading={'Send Money'} />
 
                 <Box style={userDetailsStyles}>
                     <Avatar sx={{background: '#65B741'}}>{searchParams.get('name')[0]}</Avatar>

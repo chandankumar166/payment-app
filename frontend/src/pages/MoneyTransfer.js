@@ -52,13 +52,9 @@ const MoneyTransfer = () => {
                 navigate('/dashboard');
             }
             catch (error) {
-                // console.log(error);
-                // if (error.response.data.message === 'Insufficient balance') {
                     console.log(error);
                     setIsError(true);
                     setErrorMessage(error.response.data.message)
-                // }
-                // navigate('/dashboard');
             }
         }
         else if (user == null) {

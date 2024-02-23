@@ -1,6 +1,6 @@
 const express = require('express');
 const {authMiddleware} = require('../middleware');
-const {Account} = require('../db');
+const {Account, Transaction, User} = require('../db');
 const {default: mongoose} = require('mongoose');
 
 const accountRouter = express.Router();
@@ -50,11 +50,64 @@ accountRouter.post('/transfer', authMiddleware, async (req, res) => {
         }).session(session);
 
         session.commitTransaction();
+
+        const date = new Date();
+        let invoiceId = '';
+        for (let i = 0; i <= 6; i++) {
+            invoiceId += Math.round(Math.random() * 10);
+        }
+        const sender = await User.findById(senderAccountId);
+        const receiver = await User.findById(receiverAccountId);
+
+        const senderTransactions = await Transaction.findOne({userId: senderAccountId});
+        const receiverTransactions = await Transaction.findOne({userId: receiverAccountId});
+        const senderTransactionData = {
+            amount: amount,
+            status: 'Transfer',
+            transactionDate: (date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate()),
+            invoiceId: 'OP' + invoiceId
+        }
+        const receiverTransactionData = {
+            amount: amount,
+            status: 'Receive',
+            transactionDate: (date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate()),
+            invoiceId: 'OP' + invoiceId
+        }
+        if (!senderTransactions) {
+            const senderTransaction = {
+                userId: senderAccountId,
+                name: sender.firstName + ' ' + sender.lastName,
+                transactions: [senderTransactionData]
+            };
+            await Transaction.create(senderTransaction);
+        }
+        if (!receiverTransactions) {
+            const receiverTransaction = {
+                userId: receiverAccountId,
+                name: receiver.firstName + ' ' + receiver.lastName,
+                transactions: [receiverTransactionData]
+            };
+            await Transaction.create(receiverTransaction);
+        }
+        if (senderTransactions) {
+            await Transaction.findOneAndUpdate({userId: senderAccountId},{
+                $push: {
+                    transactions: senderTransactionData
+                }
+            })
+        }
+        if (receiverTransactions) {
+            await Transaction.findOneAndUpdate({userId: receiverAccountId}, {
+                $push: {
+                    transactions: receiverTransactionData
+                }
+            })
+        }
         return res.status(200).json({message: 'Transfer Successfull'});
 
     }
     catch (error) {
-        return res.status(500).json({message: error});
+        return res.status(500).send(error);
     }
 });
 

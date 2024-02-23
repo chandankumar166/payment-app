@@ -19,6 +19,22 @@ const accountSchema = new mongoose.Schema({
     balance: Number
 })
 
+const transactionHistorySchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    name: String,
+    transactions: [new mongoose.Schema(
+        {
+            invoiceId: String,
+            amount: Number,
+            status: String,
+            transactionDate: String
+        })
+    ]
+})
+
 userSchema.methods.createHash = async function (password) {
     const saltRounds = 10;
     const salt = await bcrypt.genSalt(saltRounds);
@@ -32,5 +48,6 @@ userSchema.methods.validatePassword = async function (password, hashedPassword) 
 
 const User = mongoose.model('user', userSchema);
 const Account = mongoose.model('account', accountSchema);
+const Transaction = mongoose.model('transaction', transactionHistorySchema)
 
-module.exports = {User, Account};
+module.exports = {User, Account, Transaction};
